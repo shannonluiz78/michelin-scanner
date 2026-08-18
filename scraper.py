@@ -38,7 +38,6 @@ def scrape_michelin_singapore():
                 link_el = card.find('a', href=True)
                 michelin_link = f"https://guide.michelin.com{link_el['href']}" if link_el else base_url
 
-                # Fetch individual restaurant page for authentic og:image cover photo
                 image_url = ""
                 try:
                     detail_req = urllib.request.Request(michelin_link, headers=headers)
