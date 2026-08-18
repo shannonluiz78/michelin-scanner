@@ -22,7 +22,7 @@
   <script type="text/babel">
     const { useState, useMemo, useEffect } = React;
 
-    // Verified Dataset: 3-Stars (3), 2-Stars (9), 1-Stars (33) with 100% Unique Image URLs
+    // 45 Singapore Michelin Star Restaurants with 45 Unique Cuisine-Specific Photos (Option 1)
     const EXACT_MICHELIN_LIST = [
       // --- 3 MICHELIN STARS (3) ---
       { id: "les-amis", name: "Les Amis", distinction: "3 Stars", stars: 3, cuisine: "French", location: "Orchard", address: "#01-16 Shaw Centre, 1 Scotts Road", priceMin: 220, priceMax: 420, signature: "Black Truffle Tart & Cold Angel Hair", rating: 4.8, reviewCount: 982, description: "Haute French gastronomy with an award-winning wine cellar.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/les-amis", imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" },
@@ -93,7 +93,7 @@
               setRestaurants(data);
             }
           })
-          .catch(() => console.log("Loaded Excel-verified Michelin dataset."));
+          .catch(() => console.log("Loaded Excel-verified Michelin dataset with Unsplash photos."));
       }, []);
 
       const cuisinesList = useMemo(() => ["Any", ...new Set(restaurants.map(r => r.cuisine))], [restaurants]);
