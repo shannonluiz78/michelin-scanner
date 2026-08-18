@@ -20,10 +20,9 @@
 <body>
   <div id="root"></div>
 
-  <script type="type/babel">
+  <script type="text/babel">
     const { useState, useMemo, useEffect } = React;
 
-    // Distinct default dataset with individual photo references for all tiers
     const FALLBACK_RESTAURANTS = [
       // --- 3 MICHELIN STARS ---
       {
@@ -270,9 +269,7 @@
       const [maxPrice, setMaxPrice] = useState(600);
       const [sortBy, setSortBy] = useState("rating");
       const [selectedId, setSelectedId] = useState("odette");
-      const [favorites, setFavorites] = useState({});
 
-      // Dynamically fetch scraped JSON output if present on deployment
       useEffect(() => {
         fetch("restaurants.json")
           .then(res => res.json())
@@ -282,7 +279,7 @@
               setSelectedId(data[0].id);
             }
           })
-          .catch(() => console.log("Loaded default Michelin dataset."));
+          .catch(() => console.log("Loaded fallback dataset."));
       }, []);
 
       const cuisinesList = useMemo(() => ["Any", ...new Set(restaurants.map(r => r.cuisine))], [restaurants]);
@@ -324,7 +321,6 @@
 
       return (
         <div className="min-h-screen pb-12">
-          {/* Header Banner */}
           <header className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 border-b border-slate-800 p-6 md:p-8">
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
@@ -346,10 +342,8 @@
           </header>
 
           <main className="max-w-7xl mx-auto px-4 mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Dashboard Controls and Cards */}
             <div className="lg:col-span-8 flex flex-col gap-6">
               
-              {/* Filter Section */}
               <div className="glass-card p-5 rounded-2xl shadow-xl">
                 <h2 className="text-sm font-semibold text-slate-300 mb-4">SEARCH & FILTER RESTAURANTS</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -405,7 +399,6 @@
                 </div>
               </div>
 
-              {/* Header Bar */}
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="text-lg font-bold text-white">RESTAURANT LISTINGS</h3>
@@ -426,7 +419,6 @@
                 </div>
               </div>
 
-              {/* Grid of Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filtered.map(r => (
                   <div 
@@ -468,7 +460,6 @@
               </div>
             </div>
 
-            {/* Sidebar Details Panel */}
             <div className="lg:col-span-4">
               <div className="glass-card p-5 rounded-2xl sticky top-6 space-y-5">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-2">
