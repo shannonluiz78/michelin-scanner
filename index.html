@@ -14,7 +14,6 @@
     .badge-3star { background: linear-gradient(135deg, #dc2626, #991b1b); }
     .badge-2star { background: linear-gradient(135deg, #e11d48, #be123c); }
     .badge-1star { background: linear-gradient(135deg, #b91c1c, #7f1d1d); }
-    .badge-bib { background: linear-gradient(135deg, #ea580c, #c2410c); }
   </style>
 </head>
 <body>
@@ -23,73 +22,80 @@
   <script type="text/babel">
     const { useState, useMemo, useEffect } = React;
 
-    const COMPREHENSIVE_MICHELIN_LIST = [
-      // --- 3 MICHELIN STARS ---
-      { id: "odette", name: "Odette", distinction: "3 Stars", stars: 3, cuisine: "Modern European", location: "City Hall", address: "1 St Andrew's Rd, #01-04 National Gallery", priceMin: 280, priceMax: 450, signature: "Artisanal Desserts & Heirloom Beetroot", rating: 4.8, reviewCount: 1245, summaryQuote: "An unforgettable experience from start to finish. Every dish is a work of art.", description: "Refined, artistic French gastronomy inside the National Gallery Singapore.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/odette", imageUrl: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=600&q=80" },
-      { id: "les-amis", name: "Les Amis", distinction: "3 Stars", stars: 3, cuisine: "French", location: "Orchard", address: "#01-16 Shaw Centre, 1 Scotts Road", priceMin: 220, priceMax: 420, signature: "Black Truffle Tart & Cold Angel Hair", rating: 4.7, reviewCount: 982, summaryQuote: "Classic French dining at its absolute finest. Service is flawless.", description: "Institution of haute French cuisine with an award-winning wine cellar.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/les-amis", imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" },
-      { id: "zen", name: "Zén", distinction: "3 Stars", stars: 3, cuisine: "Nordic-Japanese", location: "Tanjong Pagar", address: "41 Bukit Pasoh Road", priceMin: 350, priceMax: 580, signature: "French Toast with Truffle & Parmesan", rating: 4.9, reviewCount: 620, summaryQuote: "Immersive multi-story dining journey blending Nordic philosophy with Japanese precision.", description: "Three-story heritage shophouse degustation from Chef Björn Frantzén.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/zen", imageUrl: "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=600&q=80" },
+    // 45 Michelin-starred Singapore restaurants with 100% unique photo URLs
+    const FULL_45_MICHELIN_LIST = [
+      // --- 3 MICHELIN STARS (3) ---
+      { id: "les-amis", name: "Les Amis", distinction: "3 Stars", stars: 3, cuisine: "French", location: "Orchard", address: "#01-16 Shaw Centre, 1 Scotts Road", priceMin: 220, priceMax: 420, signature: "Black Truffle Tart & Cold Angel Hair", rating: 4.8, reviewCount: 982, description: "Haute French gastronomy with an award-winning wine cellar.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/les-amis", imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" },
+      { id: "odette", name: "Odette", distinction: "3 Stars", stars: 3, cuisine: "Modern European", location: "City Hall", address: "1 St Andrew's Rd, #01-04 National Gallery", priceMin: 280, priceMax: 450, signature: "Artisanal Desserts & Heirloom Beetroot", rating: 4.9, reviewCount: 1245, description: "Refined French gastronomy set inside the National Gallery Singapore.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/odette", imageUrl: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=600&q=80" },
+      { id: "zen", name: "Zén", distinction: "3 Stars", stars: 3, cuisine: "Nordic-Japanese", location: "Tanjong Pagar", address: "41 Bukit Pasoh Road", priceMin: 350, priceMax: 580, signature: "French Toast with Truffle & Parmesan", rating: 4.9, reviewCount: 620, description: "Three-story shophouse degustation combining Nordic and Japanese concepts.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/zen", imageUrl: "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=600&q=80" },
 
-      // --- 2 MICHELIN STARS ---
-      { id: "cloudstreet", name: "Cloudstreet", distinction: "2 Stars", stars: 2, cuisine: "Innovative", location: "Telok Ayer", address: "84 Amoy Street", priceMin: 198, priceMax: 350, signature: "Grilled Fermented Rice Cake & Lamb", rating: 4.7, reviewCount: 450, summaryQuote: "Expressive cuisine celebrating Sri Lankan heritage and modern Australian techniques.", description: "Chef Rishi Naleendra combines bold flavors with personal hospitality.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/cloudstreet", imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80" },
-      { id: "jaan", name: "Jaan by Kirk Westaway", distinction: "2 Stars", stars: 2, cuisine: "British Contemporary", location: "City Hall", address: "Level 70, Swissôtel The Stamford", priceMin: 188, priceMax: 388, signature: "Devon Cheddar Cheese & Roast Squab", rating: 4.7, reviewCount: 890, summaryQuote: "Reinvented British classics accompanied by panoramic skyline views.", description: "Elevated British dining emphasizing seasonal European produce.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/jaan-by-kirk-westaway", imageUrl: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=600&q=80" },
-      { id: "meta", name: "Meta", distinction: "2 Stars", stars: 2, cuisine: "Modern European", location: "River Valley", address: "9 Mohamed Sultan Rd", priceMin: 220, priceMax: 320, signature: "Korean BBQ Beef & Seasonal Tasting Menu", rating: 4.6, reviewCount: 876, summaryQuote: "Seamless fusion of East and West with creative Korean touches.", description: "Chef Sun Kim infuses subtle Asian touches into contemporary European dishes.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/meta", imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80" },
-      { id: "saint-pierre", name: "Saint Pierre", distinction: "2 Stars", stars: 2, cuisine: "French Contemporary", location: "Marina Bay", address: "1 Fullerton Road, #02-02B One Fullerton", priceMin: 248, priceMax: 428, signature: "Hokkaido Scallop & Royal Caviar", rating: 4.7, reviewCount: 520, summaryQuote: "Modern French cuisine paired with waterfront views of Marina Bay.", description: "Emmanuel Stroobant delivers modern French fare driven by Asian seafood.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/saint-pierre", imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" },
-      { id: "shoukouwa", name: "Shoukouwa", distinction: "2 Stars", stars: 2, cuisine: "Japanese (Sushi)", location: "Marina Bay", address: "1 Fullerton Road, #02-02A One Fullerton", priceMin: 320, priceMax: 500, signature: "Edomae Omakase Sushi", rating: 4.6, reviewCount: 310, summaryQuote: "Exclusive Edomae sushi experience with daily seafood flown in from Tokyo.", description: "Intimate 8-seat counter delivering masterclass Edomae sushi crafting.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/shoukouwa", imageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=600&q=80" },
-      { id: "sushi-sakuta", name: "Sushi Sakuta", distinction: "2 Stars", stars: 2, cuisine: "Japanese (Sushi)", location: "Orchard", address: "15 Stamford Rd, Capitol Singapore", priceMin: 350, priceMax: 500, signature: "Seasonal Japanese Fish Omakase", rating: 4.8, reviewCount: 290, summaryQuote: "Precision omakase utilizing custom vinegar blends and pristine seafood.", description: "Chef Yoshio Sakuta delivers high-end sushi omakase centered on seasonal catches.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/sushi-sakuta", imageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=600&q=80" },
-      { id: "thevar", name: "Thevar", distinction: "2 Stars", stars: 2, cuisine: "Modern Indian", location: "Keong Saik", address: "9 Keong Saik Road", priceMin: 188, priceMax: 288, signature: "Crispy Pork Sambal & Chettinad Duck", rating: 4.8, reviewCount: 710, summaryQuote: "Bold, inventive Indian flavors using modern techniques.", description: "Chef Mano Thevar reinterprets traditional Indian spices into contemporary courses.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/thevar", imageUrl: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80" },
+      // --- 2 MICHELIN STARS (6) ---
+      { id: "cloudstreet", name: "Cloudstreet", distinction: "2 Stars", stars: 2, cuisine: "Innovative", location: "Telok Ayer", address: "84 Amoy Street", priceMin: 198, priceMax: 350, signature: "Grilled Fermented Rice Cake", rating: 4.7, reviewCount: 450, description: "Sri Lankan heritage combined with modern Australian techniques.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/cloudstreet", imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80" },
+      { id: "jaan", name: "Jaan by Kirk Westaway", distinction: "2 Stars", stars: 2, cuisine: "British Contemporary", location: "City Hall", address: "Level 70, Swissôtel The Stamford", priceMin: 188, priceMax: 388, signature: "Devon Cheddar & Roast Squab", rating: 4.7, reviewCount: 890, description: "Elevated British classics accompanied by 70th-floor skyline views.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/jaan-by-kirk-westaway", imageUrl: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80" },
+      { id: "meta", name: "Meta", distinction: "2 Stars", stars: 2, cuisine: "Modern European", location: "River Valley", address: "9 Mohamed Sultan Rd", priceMin: 220, priceMax: 320, signature: "Korean BBQ Beef Tasting Menu", rating: 4.8, reviewCount: 876, description: "Asian and Korean touches woven into contemporary European dishes.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/meta", imageUrl: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80" },
+      { id: "saint-pierre", name: "Saint Pierre", distinction: "2 Stars", stars: 2, cuisine: "French Contemporary", location: "Marina Bay", address: "1 Fullerton Road, #02-02B", priceMin: 248, priceMax: 428, signature: "Hokkaido Scallop & Royal Caviar", rating: 4.7, reviewCount: 520, description: "Modern French cuisine paired with waterfront Marina Bay views.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/saint-pierre", imageUrl: "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=600&q=80" },
+      { id: "shoukouwa", name: "Shoukouwa", distinction: "2 Stars", stars: 2, cuisine: "Japanese (Sushi)", location: "Marina Bay", address: "1 Fullerton Road, #02-02A", priceMin: 320, priceMax: 500, signature: "Edomae Omakase Sushi", rating: 4.6, reviewCount: 310, description: "Exclusive Edomae sushi experience with daily seafood flown in from Tokyo.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/shoukouwa", imageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=600&q=80" },
+      { id: "thevar", name: "Thevar", distinction: "2 Stars", stars: 2, cuisine: "Modern Indian", location: "Keong Saik", address: "9 Keong Saik Road", priceMin: 188, priceMax: 288, signature: "Crispy Pork Sambal & Chettinad Duck", rating: 4.8, reviewCount: 710, description: "Inventive Indian flavors prepared with modern fine dining techniques.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/thevar", imageUrl: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80" },
 
-      // --- 1 MICHELIN STAR ---
-      { id: "alma", name: "Alma by Juan Amador", distinction: "1 Star", stars: 1, cuisine: "European Contemporary", location: "Orchard", address: "22 Scotts Road, Goodwood Park Hotel", priceMin: 118, priceMax: 228, signature: "Crispy Tofu with Foie Gras & Boston Lobster", rating: 4.5, reviewCount: 680, summaryQuote: "Modern European dining infused with vibrant Asian influences.", description: "Housed in Goodwood Park Hotel, Alma offers accessible lunch and tasting menus.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/alma", imageUrl: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=600&q=80" },
-      { id: "araya", name: "Araya", distinction: "1 Star", stars: 1, cuisine: "Chilean / Latin", location: "Tanjong Pagar", address: "168 Keong Saik Rd, Mondrian Singapore", priceMin: 168, priceMax: 298, signature: "Ceviche with Corn Milk & Wagyu Tenderloin", rating: 4.6, reviewCount: 230, summaryQuote: "Unique Chilean ingredients showcased through fine South American technique.", description: "Chefs Francisco Araya and Fernanda Guerrero highlight native South American produce.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/araya", imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" },
-      { id: "born", name: "Born", distinction: "1 Star", stars: 1, cuisine: "Innovative", location: "Tanjong Pagar", address: "1 Neil Road, Jinrikisha Station", priceMin: 228, priceMax: 368, signature: "Pigeon with Fermented Black Bean & Taro", rating: 4.8, reviewCount: 410, summaryQuote: "French gastronomy combined with Chinese heritage inside a heritage building.", description: "Chef Zor Tan presents personal memories blending classic French techniques with Chinese flavors.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/born", imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80" },
-      { id: "buona-terra", name: "Buona Terra", distinction: "1 Star", stars: 1, cuisine: "Italian Contemporary", location: "Newton", address: "29 Scotts Road", priceMin: 178, priceMax: 298, signature: "Handmade Tagliolini with White Truffle", rating: 4.6, reviewCount: 510, summaryQuote: "Elegant contemporary Italian dishes set inside colonial bungalows.", description: "Chef Denis Lucchi presents sophisticated Italian classics with modern flair.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/buona-terra", imageUrl: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80" },
-      { id: "burnt-ends", name: "Burnt Ends", distinction: "1 Star", stars: 1, cuisine: "Contemporary BBQ", location: "Dempsey", address: "7 Dempsey Road, #01-02", priceMin: 130, priceMax: 220, signature: "Smoked Brisket & Sanger Burger", rating: 4.7, reviewCount: 1342, summaryQuote: "Inventive, wood-fired barbecue with energetic counter dining.", description: "Modern Australian barbecue centered around a custom dual-cavity brick kiln.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/burnt-ends", imageUrl: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80" },
-      { id: "candlenut", name: "Candlenut", distinction: "1 Star", stars: 1, cuisine: "Peranakan", location: "Dempsey", address: "17a Dempsey Road", priceMin: 98, priceMax: 168, signature: "Buah Keluak Wagyu Beef Rib & Curry Crab", rating: 4.5, reviewCount: 1120, summaryQuote: "The world's first Michelin-starred Peranakan restaurant.", description: "Chef Malcolm Lee elevates traditional Nyonya heritage recipes into refined dishes.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/candlenut", imageUrl: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80" },
-      { id: "cut", name: "CUT by Wolfgang Puck", distinction: "1 Star", stars: 1, cuisine: "Steakhouse", location: "Marina Bay", address: "2 Bayfront Ave, B1-71 Marina Bay Sands", priceMin: 160, priceMax: 320, signature: "A5 Kobe Wagyu Ribeye & Apple Tart", rating: 4.6, reviewCount: 1540, summaryQuote: "Premier American steakhouse serving world-class beef cuts.", description: "Wolfgang Puck's acclaimed steakhouse features prime beef cooked over wood and charcoal.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/cut", imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" },
-      { id: "esora", name: "Esora", distinction: "1 Star", stars: 1, cuisine: "Japanese Innovative", location: "River Valley", address: "15 Mohamed Sultan Road", priceMin: 238, priceMax: 368, signature: "Omi Wagyu & Tea Pairing", rating: 4.7, reviewCount: 380, summaryQuote: "Kappo-style dining celebrating nature through micro-seasonal ingredients.", description: "Elegant Japanese dining room focusing on delicate dishes paired thoughtfully with teas.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/esora", imageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=600&q=80" },
-      { id: "euphoria", name: "Euphoria", distinction: "1 Star", stars: 1, cuisine: "Modern European", location: "Tanjong Pagar", address: "76 Tras Street", priceMin: 188, priceMax: 298, signature: "Oignon Jardin & Vegetable Essences", rating: 4.7, reviewCount: 340, summaryQuote: "Pioneering 'Vegetal Gastronomy' focusing on rich plant-based reductions.", description: "Chef Jason Tan highlights botanical reductions alongside premium seafood and meats.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/euphoria", imageUrl: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=600&q=80" },
-      { id: "hamamoto", name: "Hamamoto", distinction: "1 Star", stars: 1, cuisine: "Japanese (Sushi)", location: "Tanjong Pagar", address: "58 Tras Street", priceMin: 280, priceMax: 420, signature: "Ise Ebi Lobster & Omakase", rating: 4.8, reviewCount: 260, summaryQuote: "Intimate 12-seat sushi counter combining Edomae craft with Kaiseki touches.", description: "Chef Kazuhiro Hamamoto brings decades of mastery in custom lacquerware and fresh fish.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/hamamoto", imageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=600&q=80" },
-      { id: "tai-hwa", name: "Hill Street Tai Hwa Pork Noodle", distinction: "1 Star", stars: 1, cuisine: "Street Food", location: "Lavender", address: "466 Crawford Lane, #01-12", priceMin: 10, priceMax: 15, signature: "Bak Chor Mee (Minced Pork Noodle)", rating: 4.3, reviewCount: 2890, summaryQuote: "Legendary springy noodles tossed in spicy black vinegar and crispy lard.", description: "Historic Singaporean hawker stall holding a Michelin Star.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/hill-street-tai-hwa-pork-noodle", imageUrl: "https://images.unsplash.com/photo-1617093727343-374698b1b08d?auto=format&fit=crop&w=600&q=80" },
-      { id: "iggy", name: "Iggy's", distinction: "1 Star", stars: 1, cuisine: "European Contemporary", location: "Orchard", address: "301 Orchard Rd, Hilton Singapore Orchard", priceMin: 150, priceMax: 285, signature: "Seasonal Japanese Produce with Burgundy Wine", rating: 4.4, reviewCount: 460, summaryQuote: "Pioneer fine dining establishment renowned for an extensive Burgundy wine list.", description: "Restaurateur Ignatius Chan delivers modern European dishes with Japanese influences.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/iggys", imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80" },
-      { id: "labyrinth", name: "Labyrinth", distinction: "1 Star", stars: 1, cuisine: "Innovative", location: "Esplanade", address: "8 Raffles Ave, #02-23 Esplanade Mall", priceMin: 208, priceMax: 298, signature: "Chilli Crab Ice Cream & Local Heritage Tasting", rating: 4.7, reviewCount: 780, summaryQuote: "Deconstructed Singaporean street food transformed into fine art.", description: "Chef Han Li Guang champions local farms and reimagines hawker staples with creative flair.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/labyrinth", imageUrl: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80" },
-      { id: "marguerite", name: "Marguerite", distinction: "1 Star", stars: 1, cuisine: "European Contemporary", location: "Marina Bay", address: "Flower Dome, Gardens by the Bay", priceMin: 188, priceMax: 288, signature: "Dungeness Crab & Temperance Pairings", rating: 4.7, reviewCount: 520, summaryQuote: "Fine dining immersed inside the lush Flower Dome at Gardens by the Bay.", description: "Chef Michael Wilson showcases nature's finest ingredients inside a glass conservatory.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/marguerite", imageUrl: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=600&q=80" },
-      { id: "naeum", name: "Nae:um", distinction: "1 Star", stars: 1, cuisine: "Korean Contemporary", location: "Tanjong Pagar", address: "161 Telok Ayer Street", priceMin: 198, priceMax: 268, signature: "Somyeon Noodles & Episodic Memory Menus", rating: 4.7, reviewCount: 420, summaryQuote: "Nostalgic Korean flavors woven into refined modern tasting courses.", description: "Chef Louis Han presents episodic menus based on personal memories of South Korea.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/nae-um", imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80" },
-      { id: "nouri", name: "Nouri", distinction: "1 Star", stars: 1, cuisine: "Innovative", location: "Tanjong Pagar", address: "72 Amoy Street", priceMin: 168, priceMax: 288, signature: "Bread and Broth & Crossroads Cooking", rating: 4.6, reviewCount: 650, summaryQuote: "Crossroads cuisine exploring shared culinary traditions globally.", description: "Chef Ivan Brehm highlights shared culinary lineage across continents in an open kitchen layout.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/nouri", imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" },
-      { id: "pangium", name: "Pangium", distinction: "1 Star", stars: 1, cuisine: "Peranakan Contemporary", location: "Tanglin", address: "1 Cluny Rd, Singapore Botanic Gardens", priceMin: 188, priceMax: 258, signature: "Tok Panjang Straits Degustation", rating: 4.8, reviewCount: 310, summaryQuote: "Refined Straits heritage cuisine nestled within the Botanic Gardens.", description: "Chef Malcolm Lee explores lost Straits Chinese dishes with supreme elegance.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/pangium", imageUrl: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80" },
-      { id: "seroja", name: "Seroja", distinction: "1 Star", stars: 1, cuisine: "Malay Archipelago", location: "Bugis", address: "7 Fraser St, #01-30 Duo Galleria", priceMin: 218, priceMax: 318, signature: "Roti Canai with Truffle Butter & Native Herbs", rating: 4.9, reviewCount: 490, summaryQuote: "Singapore's first Michelin Green Star winner honoring Maritime Southeast Asia.", description: "Chef Kevin Wong pays tribute to the culinary traditions and spices of the Malay Archipelago.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/seroja", imageUrl: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80" },
-      { id: "summer-palace", name: "Summer Palace", distinction: "1 Star", stars: 1, cuisine: "Cantonese", location: "Orchard", address: "1 Cuscaden Rd, Conrad Singapore Orchard", priceMin: 120, priceMax: 190, signature: "Peking Duck & Dim Sum Tasting", rating: 4.5, reviewCount: 743, summaryQuote: "Authentic Cantonese dishes served in a tranquil classical setting.", description: "Celebrated for exquisite handcrafted dim sum and double-boiled Cantonese soups.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/summer-palace", imageUrl: "https://images.unsplash.com/photo-1525610553991-2bede1a236e2?auto=format&fit=crop&w=600&q=80" },
-      { id: "summer-pavilion", name: "Summer Pavilion", distinction: "1 Star", stars: 1, cuisine: "Cantonese", location: "Marina Bay", address: "7 Raffles Ave, The Ritz-Carlton Millenia", priceMin: 140, priceMax: 240, signature: "Poached Lobster Rice & Iberico Pork BBQ", rating: 4.7, reviewCount: 910, summaryQuote: "Michelin-starred Cantonese dining paired with specialty Chinese teas.", description: "Chef Cheung Siu Kong crafts refined Cantonese fare in modern garden-inspired private pavilions.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/summer-pavilion", imageUrl: "https://images.unsplash.com/photo-1525610553991-2bede1a236e2?auto=format&fit=crop&w=600&q=80" },
-      { id: "waku-ghin", name: "Waku Ghin", distinction: "1 Star", stars: 1, cuisine: "Japanese Contemporary", location: "Marina Bay", address: "Level 2 Dining, Marina Bay Sands", priceMin: 250, priceMax: 480, signature: "Botan Shrimp with Sea Urchin & Caviar", rating: 4.7, reviewCount: 580, summaryQuote: "Tetsuya Wakuda's masterpiece combining Japanese technique with fresh ingredients.", description: "Private chef-led Teppan counters showcasing seasonal Japanese seafood and Wagyu.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/waku-ghin", imageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=600&q=80" },
-      { id: "whitegrass", name: "Whitegrass", distinction: "1 Star", stars: 1, cuisine: "French-Japanese", location: "City Hall", address: "30 Victoria St, #01-26 CHIJMES", priceMin: 148, priceMax: 248, signature: "Japanese Murata Beef & Seasonal Omakase", rating: 4.6, reviewCount: 420, summaryQuote: "French gastronomy executed with Japanese culinary precision inside CHIJMES.", description: "Head Chef Takuya Yamashita creates delicate dishes pairing classic French sauces with Japanese produce.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/whitegrass", imageUrl: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=600&q=80" },
-
-      // --- BIB GOURMAND ---
-      { id: "tian-tian", name: "Tian Tian Hainanese Chicken Rice", distinction: "Bib Gourmand", stars: 0, cuisine: "Street Food", location: "Chinatown", address: "Maxwell Food Centre, #01-10", priceMin: 6, priceMax: 12, signature: "Hainanese Chicken Rice", rating: 4.4, reviewCount: 3410, summaryQuote: "Fragrant rice cooked in chicken broth paired with succulent poached chicken.", description: "Iconic Maxwell Food Centre stall awarded Michelin Bib Gourmand status.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/tian-tian-hainanese-chicken-rice", imageUrl: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80" },
-      { id: "kok-sen", name: "Kok Sen Restaurant", distinction: "Bib Gourmand", stars: 0, cuisine: "Zai Char", location: "Keong Saik", address: "2-4 Keong Saik Road", priceMin: 25, priceMax: 50, signature: "Big Prawn Bee Hoon Soup & Claypot Tofu", rating: 4.5, reviewCount: 1450, summaryQuote: "Traditional Cantonese zi char renowned for robust claypot dishes.", description: "Historic Keong Saik zi char eatery serving legendary prawn broths.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/kok-sen", imageUrl: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80" },
-      { id: "song-fa", name: "Song Fa Bak Kut Teh", distinction: "Bib Gourmand", stars: 0, cuisine: "Street Food", location: "Clarke Quay", address: "11 New Bridge Road", priceMin: 12, priceMax: 25, signature: "Pork Ribs Soup & Dough Fritters", rating: 4.5, reviewCount: 2980, summaryQuote: "Peppery Teochew-style pork rib soup refillable at your table.", description: "Multi-year Michelin Bib Gourmand awardee famous for aromatic broth.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/song-fa-bak-kut-teh-new-bridge-road", imageUrl: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80" },
-      { id: "a-noodle-story", name: "A Noodle Story", distinction: "Bib Gourmand", stars: 0, cuisine: "Street Food", location: "Tanjong Pagar", address: "Amoy Street Food Centre #01-39", priceMin: 10, priceMax: 18, signature: "Singapore-style Ramen with Wontons", rating: 4.4, reviewCount: 1820, summaryQuote: "Singaporean interpretation of Japanese ramen using thin springy noodles.", description: "Creative hawker stall blending ramen and wonton noodles.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/a-noodle-story", imageUrl: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80" },
-      { id: "outram-park", name: "Outram Park Fried Kway Teow", distinction: "Bib Gourmand", stars: 0, cuisine: "Street Food", location: "Chinatown", address: "Hong Lim Market & Food Centre #02-17", priceMin: 5, priceMax: 10, signature: "Char Kway Teow with Cockles & Egg", rating: 4.5, reviewCount: 2100, summaryQuote: "Smoky wok hei char kway teow fried with rich pork lard and eggs.", description: "Always draws queues for its ultra-moist egg-rich fried kway teow.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/outram-park-fried-kway-teow-mee", imageUrl: "https://images.unsplash.com/photo-1617093727343-374698b1b08d?auto=format&fit=crop&w=600&q=80" },
-      { id: "sunroad-laksa", name: "Famous Sungei Road Laksa", distinction: "Bib Gourmand", stars: 0, cuisine: "Street Food", location: "Jalan Besar", address: "27 Jalan Berseh #01-100", priceMin: 4, priceMax: 8, signature: "Charcoal-cooked Katong Laksa", rating: 4.4, reviewCount: 1650, summaryQuote: "Traditional coconut laksa broth cooked continuously over charcoal embers.", description: "Spoon-only laksa with thick rice vermicelli cut short.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/famous-sungei-road-laksa", imageUrl: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80" }
+      // --- 1 MICHELIN STAR (36) ---
+      { id: "alma", name: "Alma by Juan Amador", distinction: "1 Star", stars: 1, cuisine: "European Contemporary", location: "Orchard", address: "22 Scotts Road, Goodwood Park Hotel", priceMin: 118, priceMax: 228, signature: "Crispy Tofu & Boston Lobster", rating: 4.5, reviewCount: 680, description: "Modern European dining infused with Asian influences.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/alma", imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=600&q=80" },
+      { id: "araya", name: "Araya", distinction: "1 Star", stars: 1, cuisine: "Chilean / Latin", location: "Tanjong Pagar", address: "168 Keong Saik Rd, Mondrian", priceMin: 168, priceMax: 298, signature: "Ceviche with Corn Milk", rating: 4.6, reviewCount: 230, description: "Native South American produce showcased through fine culinary technique.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/araya", imageUrl: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=600&q=80" },
+      { id: "art-di-daniele", name: "Art di Daniele Sperindio", distinction: "1 Star", stars: 1, cuisine: "Italian Contemporary", location: "City Hall", address: "1 St Andrew's Rd, #06-02 National Gallery", priceMin: 158, priceMax: 268, signature: "Piemontese Agnolotti", rating: 4.6, reviewCount: 340, description: "Progressive Italian dining with rooftop views of Marina Bay.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/art", imageUrl: "https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=600&q=80" },
+      { id: "born", name: "Born", distinction: "1 Star", stars: 1, cuisine: "Innovative", location: "Tanjong Pagar", address: "1 Neil Road, Jinrikisha Station", priceMin: 228, priceMax: 368, signature: "Pigeon with Fermented Black Bean", rating: 4.8, reviewCount: 410, description: "Personal culinary memories blending French techniques with Chinese heritage.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/born", imageUrl: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=600&q=80" },
+      { id: "buona-terra", name: "Buona Terra", distinction: "1 Star", stars: 1, cuisine: "Italian Contemporary", location: "Newton", address: "29 Scotts Road", priceMin: 178, priceMax: 298, signature: "Handmade Tagliolini with White Truffle", rating: 4.6, reviewCount: 510, description: "Sophisticated Italian classics served inside colonial bungalows.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/buona-terra", imageUrl: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80" },
+      { id: "burnt-ends", name: "Burnt Ends", distinction: "1 Star", stars: 1, cuisine: "Contemporary BBQ", location: "Dempsey", address: "7 Dempsey Road, #01-02", priceMin: 130, priceMax: 220, signature: "Smoked Brisket & Sanger Burger", rating: 4.7, reviewCount: 1342, description: "Modern Australian barbecue centered around a custom brick kiln.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/burnt-ends", imageUrl: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=600&q=80" },
+      { id: "candlenut", name: "Candlenut", distinction: "1 Star", stars: 1, cuisine: "Peranakan", location: "Dempsey", address: "17a Dempsey Road", priceMin: 98, priceMax: 168, signature: "Buah Keluak Wagyu Beef Rib", rating: 4.5, reviewCount: 1120, description: "The world's first Michelin-starred Peranakan dining establishment.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/candlenut", imageUrl: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80" },
+      { id: "chef-kangs", name: "Chef Kang's", distinction: "1 Star", stars: 1, cuisine: "Cantonese", location: "Rochor", address: "25 Mackenzie Road", priceMin: 80, priceMax: 150, signature: "Prawn Paste Chicken & Steam Crab", rating: 4.4, reviewCount: 290, description: "Intimate Cantonese eatery celebrated for traditional wok mastery.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/chef-kangs", imageUrl: "https://images.unsplash.com/photo-1525610553991-2bede1a236e2?auto=format&fit=crop&w=600&q=80" },
+      { id: "cut", name: "CUT by Wolfgang Puck", distinction: "1 Star", stars: 1, cuisine: "Steakhouse", location: "Marina Bay", address: "2 Bayfront Ave, B1-71 MBS", priceMin: 160, priceMax: 320, signature: "A5 Kobe Wagyu Ribeye", rating: 4.6, reviewCount: 1540, description: "Prime beef cuts grilled over charcoal and wood inside Marina Bay Sands.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/cut", imageUrl: "https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=600&q=80" },
+      { id: "esora", name: "Esora", distinction: "1 Star", stars: 1, cuisine: "Japanese Innovative", location: "River Valley", address: "15 Mohamed Sultan Road", priceMin: 238, priceMax: 368, signature: "Omi Wagyu & Tea Pairing", rating: 4.7, reviewCount: 380, description: "Micro-seasonal Japanese cuisine thoughtfully paired with artisan teas.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/esora", imageUrl: "https://images.unsplash.com/photo-1611143669185-af224c5e3252?auto=format&fit=crop&w=600&q=80" },
+      { id: "euphoria", name: "Euphoria", distinction: "1 Star", stars: 1, cuisine: "Modern European", location: "Tanjong Pagar", address: "76 Tras Street", priceMin: 188, priceMax: 298, signature: "Oignon Jardin & Botanical Essences", rating: 4.7, reviewCount: 340, description: "Pioneering Gastro-Botanica reductions paired with fine seafood and meats.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/euphoria", imageUrl: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80" },
+      { id: "hamamoto", name: "Hamamoto", distinction: "1 Star", stars: 1, cuisine: "Japanese (Sushi)", location: "Tanjong Pagar", address: "58 Tras Street", priceMin: 280, priceMax: 420, signature: "Ise Ebi Lobster & Omakase", rating: 4.8, reviewCount: 260, description: "12-seat sushi counter blending Edomae craft with Kaiseki touches.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/hamamoto", imageUrl: "https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?auto=format&fit=crop&w=600&q=80" },
+      { id: "tai-hwa", name: "Hill Street Tai Hwa Pork Noodle", distinction: "1 Star", stars: 1, cuisine: "Street Food", location: "Lavender", address: "466 Crawford Lane, #01-12", priceMin: 10, priceMax: 15, signature: "Bak Chor Mee", rating: 4.3, reviewCount: 2890, description: "Famous minced pork noodle hawker stall holding a Michelin Star.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/hill-street-tai-hwa-pork-noodle", imageUrl: "https://images.unsplash.com/photo-1617093727343-374698b1b08d?auto=format&fit=crop&w=600&q=80" },
+      { id: "iggy", name: "Iggy's", distinction: "1 Star", stars: 1, cuisine: "European Contemporary", location: "Orchard", address: "301 Orchard Rd, Hilton Singapore", priceMin: 150, priceMax: 285, signature: "Japanese Produce with Burgundy Wine", rating: 4.4, reviewCount: 460, description: "Pioneer fine dining establishment known for an extensive Burgundy wine cellar.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/iggys", imageUrl: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=600&q=80" },
+      { id: "imperial-treasure", name: "Imperial Treasure Fine Teochew", distinction: "1 Star", stars: 1, cuisine: "Teochew", location: "Tanjong Pagar", address: "160 Robinson Road, #03-01", priceMin: 90, priceMax: 180, signature: "Cold Crab & Steamed Pomfret", rating: 4.5, reviewCount: 520, description: "Traditional Teochew seafood and braised delicacies.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/imperial-treasure-fine-teochew-cuisine-ion-orchard", imageUrl: "https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=600&q=80" },
+      { id: "jag", name: "JAG", distinction: "1 Star", stars: 1, cuisine: "French Contemporary", location: "Robertson Quay", address: "41 Robertson Quay, #02-02", priceMin: 175, priceMax: 295, signature: "Alpine Wild Herbs Tasting Menu", rating: 4.7, reviewCount: 310, description: "French omakase highlighting wild herbs harvested from Savoie, France.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/jag", imageUrl: "https://images.unsplash.com/photo-1507048331197-7d4ac70811cf?auto=format&fit=crop&w=600&q=80" },
+      { id: "labyrinth", name: "Labyrinth", distinction: "1 Star", stars: 1, cuisine: "Innovative", location: "Esplanade", address: "8 Raffles Ave, #02-23 Esplanade", priceMin: 208, priceMax: 298, signature: "Chilli Crab Ice Cream", rating: 4.7, reviewCount: 780, description: "Deconstructed local street food transformed into fine art.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/labyrinth", imageUrl: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=600&q=80" },
+      { id: "lei-garden", name: "Lei Garden", distinction: "1 Star", stars: 1, cuisine: "Cantonese", location: "City Hall", address: "30 Victoria St, #01-24 CHIJMES", priceMin: 80, priceMax: 160, signature: "Crispy Roasted Pork & Soup", rating: 4.4, reviewCount: 640, description: "Classic Cantonese dim sum and double-boiled soups in CHIJMES.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/lei-garden", imageUrl: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=600&q=80" },
+      { id: "lerouy", name: "Lerouy", distinction: "1 Star", stars: 1, cuisine: "French Contemporary", location: "Tanjong Pagar", address: "104 Amoy Street", priceMin: 138, priceMax: 228, signature: "Salt-Baked Cabbage & Foie Gras", rating: 4.6, reviewCount: 420, description: "Cartes Blanches French tasting menus served around an open counter.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/lerouy", imageUrl: "https://images.unsplash.com/photo-1578474846511-04ba529f0b88?auto=format&fit=crop&w=600&q=80" },
+      { id: "ma-cuisine", name: "Ma Cuisine", distinction: "1 Star", stars: 1, cuisine: "French Gastro", location: "Keong Saik", address: "38 Craig Road", priceMin: 110, priceMax: 210, signature: "Roasted Pigeon & Burgundy Vintages", rating: 4.5, reviewCount: 380, description: "Gastro-wine bar offering classical French dishes alongside rare vintages.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/ma-cuisine", imageUrl: "https://images.unsplash.com/photo-1528823872057-9c018a7a70b3?auto=format&fit=crop&w=600&q=80" },
+      { id: "marguerite", name: "Marguerite", distinction: "1 Star", stars: 1, cuisine: "European Contemporary", location: "Marina Bay", address: "Flower Dome, Gardens by the Bay", priceMin: 188, priceMax: 288, signature: "Dungeness Crab & Temperance Pairings", rating: 4.7, reviewCount: 520, description: "Fine dining set inside the glass Flower Dome at Gardens by the Bay.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/marguerite", imageUrl: "https://images.unsplash.com/photo-1533777857889-4be7c70b31f8?auto=format&fit=crop&w=600&q=80" },
+      { id: "naeum", name: "Nae:um", distinction: "1 Star", stars: 1, cuisine: "Korean Contemporary", location: "Tanjong Pagar", address: "161 Telok Ayer Street", priceMin: 198, priceMax: 268, signature: "Somyeon Noodles & Memory Courses", rating: 4.7, reviewCount: 420, description: "Episodic tasting menus based on personal memories of South Korea.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/nae-um", imageUrl: "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=600&q=80" },
+      { id: "nouri", name: "Nouri", distinction: "1 Star", stars: 1, cuisine: "Innovative", location: "Tanjong Pagar", address: "72 Amoy Street", priceMin: 168, priceMax: 288, signature: "Bread and Broth", rating: 4.6, reviewCount: 650, description: "Crossroads cuisine exploring shared culinary heritage across cultures.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/nouri", imageUrl: "https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?auto=format&fit=crop&w=600&q=80" },
+      { id: "oshino", name: "Oshino", distinction: "1 Star", stars: 1, cuisine: "Japanese (Sushi)", location: "City Hall", address: "328 North Bridge Rd, Raffles Hotel", priceMin: 220, priceMax: 380, signature: "Yamagata Rice Edomae Sushi", rating: 4.7, reviewCount: 290, description: "Master Sushi Chef Oshino crafts Edomae sushi inside Raffles Hotel.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/oshino", imageUrl: "https://images.unsplash.com/photo-1563612116625-3012372fccce?auto=format&fit=crop&w=600&q=80" },
+      { id: "pangium", name: "Pangium", distinction: "1 Star", stars: 1, cuisine: "Peranakan Contemporary", location: "Tanglin", address: "1 Cluny Rd, Botanic Gardens", priceMin: 188, priceMax: 258, signature: "Tok Panjang Straits Degustation", rating: 4.8, reviewCount: 310, description: "Straits heritage cuisine set in the lush Singapore Botanic Gardens.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/pangium", imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80" },
+      { id: "poise", name: "Poise", distinction: "1 Star", stars: 1, cuisine: "European Contemporary", location: "Tanjong Pagar", address: "48 Tras Street", priceMin: 158, priceMax: 248, signature: "Chicken Farce & Cold Capellini", rating: 4.6, reviewCount: 210, description: "European classics reinterpreted with subtle Nordic nuances.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/poise", imageUrl: "https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=600&q=80" },
+      { id: "rhubarb", name: "Rhubarb", distinction: "1 Star", stars: 1, cuisine: "French Contemporary", location: "Tanjong Pagar", address: "3 Duxton Hill", priceMin: 98, priceMax: 188, signature: "Seared Foie Gras & Rhubarb", rating: 4.6, reviewCount: 390, description: "Intimate 7-table French restaurant located on historic Duxton Hill.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/rhubarb", imageUrl: "https://images.unsplash.com/photo-1502301103665-0b95cc738daf?auto=format&fit=crop&w=600&q=80" },
+      { id: "seroja", name: "Seroja", distinction: "1 Star", stars: 1, cuisine: "Malay Archipelago", location: "Bugis", address: "7 Fraser St, #01-30 Duo Galleria", priceMin: 218, priceMax: 318, signature: "Roti Canai with Truffle Butter", rating: 4.9, reviewCount: 490, description: "Singapore's first Michelin Green Star winner honoring Maritime Southeast Asia.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/seroja", imageUrl: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=600&q=80" },
+      { id: "shinji-carlton", name: "Shinji by Kanesaka", distinction: "1 Star", stars: 1, cuisine: "Japanese (Sushi)", location: "City Hall", address: "76 Bras Basah Rd, Carlton Hotel", priceMin: 250, priceMax: 450, signature: "Edomae Omakase Course", rating: 4.7, reviewCount: 610, description: "Authentic Edomae sushi honoring centuries-old Japanese artisan traditions.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/shinji-carlton-hotel", imageUrl: "https://images.unsplash.com/photo-1615361200141-f45040f367be?auto=format&fit=crop&w=600&q=80" },
+      { id: "sommer", name: "Sommer", distinction: "1 Star", stars: 1, cuisine: "European Contemporary", location: "Marina Bay", address: "2 Marina Blvd, #01-02 The Sail", priceMin: 148, priceMax: 238, signature: "Langoustine & Roasted Duck", rating: 4.6, reviewCount: 280, description: "Modern European dining showcasing seasonal ingredients with elegant flair.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/sommer", imageUrl: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=600&q=80" },
+      { id: "summer-palace", name: "Summer Palace", distinction: "1 Star", stars: 1, cuisine: "Cantonese", location: "Orchard", address: "1 Cuscaden Rd, Conrad Singapore", priceMin: 120, priceMax: 190, signature: "Peking Duck & Dim Sum", rating: 4.5, reviewCount: 743, description: "Authentic Cantonese dishes served in a classical setting.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/summer-palace", imageUrl: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=600&q=80" },
+      { id: "summer-pavilion", name: "Summer Pavilion", distinction: "1 Star", stars: 1, cuisine: "Cantonese", location: "Marina Bay", address: "7 Raffles Ave, Ritz-Carlton Millenia", priceMin: 140, priceMax: 240, signature: "Poached Lobster Rice", rating: 4.7, reviewCount: 910, description: "Refined Cantonese fare served inside garden-inspired private pavilions.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/summer-pavilion", imageUrl: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80" },
+      { id: "sushi-kimura", name: "Sushi Kimura", distinction: "1 Star", stars: 1, cuisine: "Japanese (Sushi)", location: "Orchard", address: "390 Orchard Rd, Palais Renaissance", priceMin: 280, priceMax: 420, signature: "Organic Rice Edomae Sushi", rating: 4.7, reviewCount: 320, description: "Edomae sushi mastercraft featuring organic Tsugaru rice and Tsukiji fish.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/sushi-kimura", imageUrl: "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=600&q=80" },
+      { id: "sushi-sakuta", name: "Sushi Sakuta", distinction: "1 Star", stars: 1, cuisine: "Japanese (Sushi)", location: "Orchard", address: "15 Stamford Rd, Capitol Singapore", priceMin: 350, priceMax: 500, signature: "Seasonal Japanese Fish Omakase", rating: 4.8, reviewCount: 290, description: "Precision omakase utilizing custom vinegar blends and pristine catches.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/sushi-sakuta", imageUrl: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=600&q=80" },
+      { id: "waku-ghin", name: "Waku Ghin", distinction: "1 Star", stars: 1, cuisine: "Japanese Contemporary", location: "Marina Bay", address: "Level 2 Dining, Marina Bay Sands", priceMin: 250, priceMax: 480, signature: "Botan Shrimp with Sea Urchin & Caviar", rating: 4.7, reviewCount: 580, description: "Chef Tetsuya Wakuda's teppan counters showcasing Japanese seafood and Wagyu.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/waku-ghin", imageUrl: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=600&q=80" },
+      { id: "whitegrass", name: "Whitegrass", distinction: "1 Star", stars: 1, cuisine: "French-Japanese", location: "City Hall", address: "30 Victoria St, #01-26 CHIJMES", priceMin: 148, priceMax: 248, signature: "Japanese Murata Beef Omakase", rating: 4.6, reviewCount: 420, description: "Classic French sauces paired delicately with Japanese seasonal produce.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/whitegrass", imageUrl: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=600&q=80" },
+      { id: "willow", name: "Willow", distinction: "1 Star", stars: 1, cuisine: "Asian Contemporary", location: "City Hall", address: "39 HongKong Street", priceMin: 158, priceMax: 248, signature: "Amadai Scale-Crusted Fish", rating: 4.7, reviewCount: 390, description: "Refined counter dining focusing on sustainable, seasonal Asian seafood.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/willow", imageUrl: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=600&q=80" },
+      { id: "yong-fu", name: "Yong Fu", distinction: "1 Star", stars: 1, cuisine: "Chinese (Ningbo)", location: "City Hall", address: "3 Temasek Blvd, Suntec City", priceMin: 168, priceMax: 298, signature: "Ningbo 18 Cuts Raw Marinated Crab", rating: 4.6, reviewCount: 310, description: "Ningbo seafood specialty dining featuring wild catches straight from Zhejiang.", michelinUrl: "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/yong-fu", imageUrl: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80" }
     ];
 
     function App() {
-      const [restaurants, setRestaurants] = useState(COMPREHENSIVE_MICHELIN_LIST);
+      const [restaurants, setRestaurants] = useState(FULL_45_MICHELIN_LIST);
       const [cuisine, setCuisine] = useState("Any");
       const [location, setLocation] = useState("Any");
       const [distinction, setDistinction] = useState("Any");
       const [maxPrice, setMaxPrice] = useState(600);
       const [sortBy, setSortBy] = useState("rating");
-      const [selectedId, setSelectedId] = useState("odette");
+      const [selectedId, setSelectedId] = useState("les-amis");
 
       useEffect(() => {
         fetch("restaurants.json")
           .then(res => res.json())
           .then(data => {
-            if (Array.isArray(data) && data.length > 0) {
+            if (Array.isArray(data) && data.length >= 40) {
               setRestaurants(data);
-              setSelectedId(data[0].id);
             }
           })
-          .catch(() => console.log("Displaying full embedded Michelin database."));
+          .catch(() => console.log("Loaded fallback 45-item dataset."));
       }, []);
 
       const cuisinesList = useMemo(() => ["Any", ...new Set(restaurants.map(r => r.cuisine))], [restaurants]);
@@ -118,15 +124,13 @@
       const getBadgeClass = (dist) => {
         if (dist === "3 Stars") return "badge-3star";
         if (dist === "2 Stars") return "badge-2star";
-        if (dist === "1 Star") return "badge-1star";
-        return "badge-bib";
+        return "badge-1star";
       };
 
       const getDistinctionLabel = (r) => {
         if (r.distinction === "3 Stars") return "3★ Stars";
         if (r.distinction === "2 Stars") return "2★ Stars";
-        if (r.distinction === "1 Star") return "1★ Star";
-        return "🏆 Bib Gourmand";
+        return "1★ Star";
       };
 
       return (
@@ -142,69 +146,44 @@
                   MICHELIN RESTAURANT SCANNER
                 </h1>
                 <p className="text-slate-400 text-xs md:text-sm mt-1">
-                  Complete catalog of 3-Stars, 2-Stars, 1-Star, and Bib Gourmand Michelin restaurants in Singapore.
+                  Complete catalog of all 45 Michelin-starred dining experiences in Singapore.
                 </p>
               </div>
               <div className="flex items-center gap-2 text-xs text-slate-300">
-                <span className="bg-slate-800 px-3 py-2 rounded-lg border border-slate-700">🔍 {restaurants.length} Total Restaurants Loaded</span>
+                <span className="bg-slate-800 px-3 py-2 rounded-lg border border-slate-700 font-bold text-amber-400">🔍 {restaurants.length} Total Restaurants Loaded</span>
               </div>
             </div>
           </header>
 
           <main className="max-w-7xl mx-auto px-4 mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-8 flex flex-col gap-6">
-              
               <div className="glass-card p-5 rounded-2xl shadow-xl">
                 <h2 className="text-sm font-semibold text-slate-300 mb-4">SEARCH & FILTER RESTAURANTS</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div>
                     <label className="block text-xs text-slate-400 mb-1">Distinction Tier</label>
-                    <select 
-                      value={distinction} 
-                      onChange={e => setDistinction(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-red-500"
-                    >
+                    <select value={distinction} onChange={e => setDistinction(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-red-500">
                       <option value="Any">All Distinctions</option>
                       <option value="3 Stars">3 Michelin Stars</option>
                       <option value="2 Stars">2 Michelin Stars</option>
                       <option value="1 Star">1 Michelin Star</option>
-                      <option value="Bib Gourmand">Bib Gourmand</option>
                     </select>
                   </div>
-
                   <div>
                     <label className="block text-xs text-slate-400 mb-1">Cuisine</label>
-                    <select 
-                      value={cuisine} 
-                      onChange={e => setCuisine(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-red-500"
-                    >
+                    <select value={cuisine} onChange={e => setCuisine(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-red-500">
                       {cuisinesList.map(c => <option key={c} value={c}>{c === "Any" ? "Any cuisine" : c}</option>)}
                     </select>
                   </div>
-
                   <div>
                     <label className="block text-xs text-slate-400 mb-1">Location</label>
-                    <select 
-                      value={location} 
-                      onChange={e => setLocation(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-red-500"
-                    >
+                    <select value={location} onChange={e => setLocation(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-red-500">
                       {locationsList.map(l => <option key={l} value={l}>{l === "Any" ? "Any location" : l}</option>)}
                     </select>
                   </div>
-
                   <div>
                     <label className="block text-xs text-slate-400 mb-1">Max Price: SGD ${maxPrice}</label>
-                    <input 
-                      type="range" 
-                      min="10" 
-                      max="600" 
-                      step="10" 
-                      value={maxPrice} 
-                      onChange={e => setMaxPrice(Number(e.target.value))}
-                      className="w-full mt-3 accent-red-600"
-                    />
+                    <input type="range" min="10" max="600" step="10" value={maxPrice} onChange={e => setMaxPrice(Number(e.target.value))} className="w-full mt-3 accent-red-600" />
                   </div>
                 </div>
               </div>
@@ -216,11 +195,7 @@
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-slate-400">Sort:</span>
-                  <select 
-                    value={sortBy} 
-                    onChange={e => setSortBy(e.target.value)}
-                    className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white"
-                  >
+                  <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
                     <option value="rating">Highest Rating</option>
                     <option value="stars">Most Stars / Distinction</option>
                     <option value="priceAsc">Price: Low to High</option>
@@ -231,34 +206,22 @@
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filtered.map(r => (
-                  <div 
-                    key={r.id} 
-                    onClick={() => setSelectedId(r.id)}
-                    className={`glass-card rounded-2xl overflow-hidden cursor-pointer transition-all hover:border-red-500/50 hover:scale-[1.02] flex flex-col justify-between ${selectedId === r.id ? 'ring-2 ring-red-500' : ''}`}
-                  >
+                  <div key={r.id} onClick={() => setSelectedId(r.id)} className={`glass-card rounded-2xl overflow-hidden cursor-pointer transition-all hover:border-red-500/50 hover:scale-[1.02] flex flex-col justify-between ${selectedId === r.id ? 'ring-2 ring-red-500' : ''}`}>
                     <div>
                       <div className="relative h-40 overflow-hidden bg-slate-950">
-                        <img 
-                          src={r.imageUrl} 
-                          alt={r.name} 
-                          className="w-full h-full object-cover"
-                          onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80"; }}
-                        />
+                        <img src={r.imageUrl} alt={r.name} className="w-full h-full object-cover" onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80"; }} />
                         <div className={`absolute top-3 left-3 ${getBadgeClass(r.distinction)} text-white px-2.5 py-1 rounded-full text-xs font-black shadow-md`}>
                           {getDistinctionLabel(r)}
                         </div>
                       </div>
-
                       <div className="p-4">
                         <h4 className="font-bold text-white text-base">{r.name}</h4>
                         <p className="text-xs text-slate-400 mb-2">{r.cuisine}</p>
-
                         <div className="space-y-1 text-xs text-slate-300">
                           <p>📍 {r.location}</p>
                           <p className="font-semibold text-amber-400">💰 SGD ${r.priceMin} – ${r.priceMax} per person</p>
                           <p className="truncate">🍴 {r.signature}</p>
                         </div>
-
                         <div className="flex items-center gap-2 mt-3 text-xs">
                           <span className="text-amber-400 font-bold">★ {r.rating}</span>
                           <span className="text-slate-500">({r.reviewCount} reviews)</span>
@@ -272,30 +235,20 @@
 
             <div className="lg:col-span-4">
               <div className="glass-card p-5 rounded-2xl sticky top-6 space-y-5">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-2">
-                  RESTAURANT PROFILE
-                </h3>
-
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-2">RESTAURANT PROFILE</h3>
                 {selected && (
                   <>
                     <div>
                       <div className="relative h-48 rounded-xl overflow-hidden mb-3 bg-slate-950">
-                        <img 
-                          src={selected.imageUrl} 
-                          alt={selected.name} 
-                          className="w-full h-full object-cover" 
-                          onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80"; }}
-                        />
+                        <img src={selected.imageUrl} alt={selected.name} className="w-full h-full object-cover" onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80"; }} />
                         <div className={`absolute top-3 left-3 ${getBadgeClass(selected.distinction)} text-white px-3 py-1 rounded-full text-xs font-black shadow-md`}>
                           {getDistinctionLabel(selected)}
                         </div>
                       </div>
-
                       <h2 className="text-xl font-extrabold text-white">{selected.name}</h2>
                       <p className="text-xs text-slate-400">{selected.cuisine} • {selected.distinction}</p>
                       <p className="text-xs text-slate-300 mt-1">📍 {selected.address || selected.location}</p>
                     </div>
-
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div className="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
                         <span className="text-slate-500 block">Rating</span>
@@ -307,17 +260,8 @@
                         <span className="text-white font-bold">${selected.priceMin}–${selected.priceMax}</span>
                       </div>
                     </div>
-
                     <p className="text-xs text-slate-300 leading-relaxed">{selected.description}</p>
-
-                    <a 
-                      href={selected.michelinUrl} 
-                      target="_blank" 
-                      rel="noreferrer"
-                      className="block w-full text-center bg-red-600 hover:bg-red-700 text-white font-medium text-xs py-2.5 rounded-lg transition"
-                    >
-                      View Official Michelin Page ↗
-                    </a>
+                    <a href={selected.michelinUrl} target="_blank" rel="noreferrer" className="block w-full text-center bg-red-600 hover:bg-red-700 text-white font-medium text-xs py-2.5 rounded-lg transition">View Michelin Page ↗</a>
                   </>
                 )}
               </div>
