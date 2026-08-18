@@ -6,6 +6,9 @@ on:
     - cron: '0 0 * * *'
   workflow_dispatch: # Enables manual "Run workflow" button in Actions tab
 
+permissions:
+  contents: write
+
 jobs:
   scan-and-update:
     runs-on: ubuntu-latest
